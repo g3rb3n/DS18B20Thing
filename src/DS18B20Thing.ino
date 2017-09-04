@@ -29,19 +29,16 @@ void setup()
   sensor += "sensor/ds18b20/";
   sensor += thing.clientId();
   thing.addSensor(sensor, 5000, [](Value& value){
-    float temperature;
-    DS18B20::Error error;
-    ds.temperature(temperature, error);
-    if (error.code != 0)
+    Return<float> temperature = ds.temperature();
+    if (!temperature.valid())
     {
-      Serial.println("Read " + error.message);
+      Serial.println(String("Error ") + temperature.code());
       led.setPattern(panic);
-      value = error.message;
       return;
     }
-    Serial.println(String("Read ") + temperature);
+    Serial.println(String("Read ") + (float)temperature);
     led.setPattern(normal);
-    value = temperature;
+    value = (float)temperature;
   });
 
   String display;
