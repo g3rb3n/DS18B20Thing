@@ -13,22 +13,21 @@ BlinkPattern::Pattern<2> panic{{1,1},25};
 BlinkPattern::Pattern<2> start{{1,9},25};
 BlinkPattern::Pattern<2> normal{{1,39},25};
 
-void setup() 
+void setup()
 {
   Serial.begin(230400);
   Serial.println();
-  Serial.println("Client:" + thing.clientId());
+  Serial.println("ClientID:" + thing.clientId());
 
   led.setPattern(start);
-  
+
   thing.onStateChange([](const String& msg){
     Serial.println(msg);
   });
 
-  String sensor;
-  sensor += "sensor/ds18b20/";
-  sensor += thing.clientId();
-  thing.addSensor(sensor, 5000, [](Value& value){
+  thing.begin();
+
+  thing.addSensor(thing.clientId() + "/ds18b20/temperature", 5000, [](Value& value){
     Return<float> temperature = ds.temperature();
     if (!temperature.valid())
     {
@@ -41,20 +40,15 @@ void setup()
     value = (float)temperature;
   });
 
-  String display;
-  display += "display/ds18b20/";
-  display += thing.clientId();
-  thing.addActuator(display, [](Value& value){
-    //Serial.println("Got " +(String) value);
+  thing.addActuator(thing.clientId() + "/ds18b20/display", [](Value& value){
+    Serial.println("Got " + String(value));
   });
 
-  if (!ds.begin()) 
+  if (!ds.begin())
   {
     Serial.println("Could not find DS18B20 sensor");
     led.setPattern(panic);
   }
-  
-  thing.begin();
 }
 
 void loop()
