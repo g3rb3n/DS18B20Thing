@@ -27,7 +27,7 @@ void setup()
 
   thing.begin();
 
-  thing.addSensor(thing.clientId() + "/ds18b20/temperature", 5000, [](Value& value){
+  thing.addSensor(thing.clientId() + "/ds18b20/temperature", 1000, [](Value& value){
     Return<float> temperature = ds.temperature();
     if (!temperature.valid())
     {
